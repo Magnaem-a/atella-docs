@@ -1,0 +1,69 @@
+---
+title: All Courses (Public)
+description: The public "Everything we teach" courses list with nested module previews.
+---
+
+Source: `scripts/all-courses.js`. A **public** page — no member required. Lists
+every course with a preview of its first modules.
+
+## Page wrapper
+
+```html
+<section
+  data-ms-code="all-courses-page"
+  ms-code-table-course="courses"
+  ms-code-table-module="modules"
+  ms-code-table-lesson="lessons">
+</section>
+```
+
+## Hero stats
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-code="courses-count"` | Total courses |
+| `data-ms-code="modules-count"` | Total modules |
+| `data-ms-code="lessons-count"` | Total lessons |
+
+## Course stack
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="course-stack"` | wrapper | Stack container |
+| `data-ms-code="course-template"` | inner | Course card, cloned per course |
+
+Inside the course card:
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="course.title"` | Title |
+| `data-ms-field="course.description"` | Description |
+| `data-ms-field="course.category"` | Category |
+| `data-ms-code="course-order"` | "COURSE 01" |
+| `data-ms-code="course-stats"` | "2 MODULES · 10 LESSONS" |
+| `data-ms-code="course-cover-bg"` / `course-cover-img` | Cover image |
+| `data-ms-code="detail-link"` | View link (`ms-code-detail-page="/course"`) |
+
+## Module preview (nested)
+
+Inside each course card, a short list of its first modules:
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="module-list"` | Module list wrapper |
+| `data-ms-code="module-template"` | Module row, cloned |
+| `data-ms-field="module.title"` / `module.description` | Module text |
+| `data-ms-code="module-stats"` | "MODULE 01 · 5 LESSONS" |
+
+The preview is capped at the first 2 modules per course.
+
+## List states
+
+Optional `data-ms-code="list-loading | list-empty | list-error"` slots inside
+the page wrapper.
+
+<Callout>
+This page reads no member data, so it works for logged-out visitors. The
+member-area equivalent — with progress and filters — is
+[All Courses (Member)](/docs/pages/member-all-courses).
+</Callout>

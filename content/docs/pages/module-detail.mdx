@@ -1,0 +1,76 @@
+---
+title: Module Detail
+description: The /module?id=... page — module hero, lesson list, and module pagination.
+---
+
+Source: `scripts/module-detail.js`. Renders one module from `?id=` (or `?slug=`).
+
+## Page wrapper
+
+```html
+<section
+  data-ms-code="module-page"
+  ms-code-id-param="id"
+  ms-code-slug-param="slug"
+  ms-code-table-course="courses"
+  ms-code-table-module="modules"
+  ms-code-table-lesson="lessons"
+  ms-code-table-progress="lesson_progress">
+</section>
+```
+
+## Hero
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="module.title"` | Title |
+| `data-ms-field="module.description"` | Description |
+| `data-ms-field="module.order"` | Module order |
+| `data-ms-field="module.lesson_count"` | Lesson count |
+| `data-ms-code="module-meta"` | "Module 02 of 03 · 5 Lessons · ~1.2 hrs" |
+| `data-ms-code="progress-label"` | "3 / 5 Lessons" |
+| `data-ms-code="progress-fill"` | Progress-bar fill |
+
+Add `data-ms-code="pad"` to a `module.order` node if the design uses a
+zero-padded label ("02").
+
+## Breadcrumbs
+
+`data-ms-code="crumb-learn | crumb-course | crumb-module"`, with
+`ms-code-detail-page` on the course and module links.
+
+## Lesson list
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="lesson-list"` | wrapper | List container |
+| `data-ms-code="lesson-template"` | inner | Row, cloned per lesson |
+| `ms-code-detail-page="/lesson"` | template link | Lesson destination |
+
+Inside each row:
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="lesson.title"` | Title |
+| `data-ms-field="lesson.duration_minutes"` | Minutes |
+| `data-ms-code="lesson-order-label"` | "Lesson 03" |
+| `data-ms-code="lesson-duration-label"` | "12 min" |
+
+Two variant groups drive each row:
+
+```html
+<div data-ms-show-if="status" data-ms-show-value="done|active|todo|locked">…</div>
+<div data-ms-show-if="action" data-ms-show-value="replay|continue|start|locked">…</div>
+```
+
+Strict drip: the first unfinished lesson is `active`/`continue`; later
+unfinished lessons are `locked` and non-clickable.
+
+## Module pagination
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="prev-module"` / `next-module"` | Pagination cards (`ms-code-detail-page="/module"`) |
+| `data-ms-code="prev-label"` / `next-label` | Optional labels |
+| `data-ms-field="module.title"` / `module.lesson_count` | Card text |
+| `data-ms-show-if="state"` (`ready` / `empty`) | Card state — `empty` for the first/last module |

@@ -1,0 +1,70 @@
+---
+title: All Courses (Member)
+description: The in-shell all-courses grid with category filters and per-course progress status.
+---
+
+Source: `scripts/member-all-courses.js`. Lives inside the member UI shell. The
+course data is global (every course), but when a member is signed in it layers
+on their real progress status.
+
+## Page wrapper
+
+```html
+<section
+  data-ms-code="member-all-courses-page"
+  ms-code-table-course="courses"
+  ms-code-table-module="modules"
+  ms-code-table-lesson="lessons"
+  ms-code-table-progress="lesson_progress">
+</section>
+```
+
+## Header stats
+
+`data-ms-code="courses-count"`, `modules-count`, `lessons-count`.
+
+## Category filters (optional)
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="filter-tabs"` | Filter bar |
+| `data-ms-code="filter-tab-template"` | One tab, cloned |
+| `data-ms-code="filter-label"` | Tab label |
+| `data-ms-code="filter-count"` | Tab badge count |
+
+The script builds **All** plus one tab per distinct `course.category`.
+
+## Course grid
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="course-grid"` | Grid wrapper |
+| `data-ms-code="course-template"` | Card, cloned per course |
+| `data-ms-field="course.title"` / `course.description` / `course.category` | Card text |
+| `data-ms-code="course-order"` | "COURSE 01" |
+| `data-ms-code="course-stats"` | "10 LESSONS · ~4 HOURS" |
+| `data-ms-code="course-modules-lessons"` | "2 MODULES · 10 LESSONS" |
+| `data-ms-code="course-cover-bg"` / `course-cover-img` | Cover image |
+| `data-ms-code="detail-link"` | View link (`ms-code-detail-page="/course"`) |
+
+## Status tags
+
+```html
+<div data-ms-show-if="status" data-ms-show-value="not_started">…</div>
+<div data-ms-show-if="status" data-ms-show-value="in_progress">…</div>
+<div data-ms-show-if="status" data-ms-show-value="complete">…</div>
+```
+
+Optional `data-ms-code="status-label"` inside a tag receives "Not started",
+"In progress", or "Completed".
+
+<Callout>
+When a member is signed in and `ms-code-table-progress` is set, status comes
+from real `lesson_progress`: **all lessons done → `complete`**, **any lesson
+opened or completed → `in_progress`**, **none → `not_started`**. With no member
+it falls back to status fields on the course record, then `not_started`.
+</Callout>
+
+## List states
+
+Optional `data-ms-code="list-loading | list-empty | list-error"` slots.

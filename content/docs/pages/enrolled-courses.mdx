@@ -1,0 +1,69 @@
+---
+title: Enrolled Courses
+description: The member's enrolled courses with progress filters.
+---
+
+Source: `scripts/enrolled-courses.js`. Member-scoped — shows only courses the
+signed-in member has an `enrollments` row for (excluding `dropped`).
+
+## Page wrapper
+
+```html
+<section
+  data-ms-code="enrolled-courses-page"
+  ms-code-table-course="courses"
+  ms-code-table-lesson="lessons"
+  ms-code-table-progress="lesson_progress"
+  ms-code-table-enrollment="enrollments">
+</section>
+```
+
+## Header stats
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-code="courses-count"` | Enrolled course count |
+| `data-ms-code="lessons-count"` | Total lessons across them |
+| `data-ms-code="hours-count"` | Combined hours estimate |
+
+## Filters
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="filter-tabs"` | Filter bar |
+| `data-ms-code="filter-tab-template"` | One tab, cloned |
+| `data-ms-code="filter-label"` / `filter-count` | Tab text + count |
+
+The script builds three tabs: **All**, **In Progress**, **Completed**.
+
+## Course grid
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="course-grid"` | Grid wrapper |
+| `data-ms-code="course-template"` | Card, cloned |
+| `data-ms-field="course.title"` / `course.description` / `course.category` | Card text |
+| `data-ms-code="course-stats"` | "10 LESSONS · ~4 HOURS" |
+| `data-ms-code="course-progress"` | "4 / 10 LESSONS" |
+| `data-ms-code="course-progress-fill"` | Progress-bar fill |
+| `data-ms-code="course-cover-bg"` / `course-cover-img` | Cover image |
+| `data-ms-code="detail-link"` | View link (`ms-code-detail-page="/course"`) |
+
+## Status variants
+
+```html
+<div data-ms-show-if="status" data-ms-show-value="not_started">…</div>
+<div data-ms-show-if="status" data-ms-show-value="in_progress">…</div>
+<div data-ms-show-if="status" data-ms-show-value="complete">…</div>
+```
+
+Optional `data-ms-code="status-label"` receives the label text.
+
+<Callout>
+Status: **`complete`** = completed lessons ≥ total; **`in_progress`** = at least
+one lesson opened or completed; **`not_started`** = no progress rows.
+</Callout>
+
+## List states
+
+Optional `data-ms-code="list-loading | list-empty | list-error"` slots.

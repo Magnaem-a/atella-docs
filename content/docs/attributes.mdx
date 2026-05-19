@@ -1,0 +1,112 @@
+---
+title: Attributes
+description: The data-ms-code, data-ms-field, and ms-code-* conventions every page shares.
+---
+
+Every page script is driven entirely by **HTML attributes**. No CSS classes are
+used as script hooks — you can restyle and rename classes freely in Webflow, as
+long as the attributes stay.
+
+There are four families of attributes.
+
+## 1. `data-ms-code` — element roles
+
+Marks an element as playing a specific **role** the script knows about: a page
+wrapper, a list container, a template, a button, a text target.
+
+```html
+<div data-ms-code="course-grid">…</div>
+<div data-ms-code="course-template">…</div>
+<a   data-ms-code="detail-link">…</a>
+```
+
+Every page begins with a **page marker** on its outer wrapper. The script only
+runs if that marker is present:
+
+| Page | Marker |
+|---|---|
+| Dashboard | (detected by its containers) |
+| Course detail | `data-ms-code="course-page"` |
+| Lesson detail | `data-ms-code="lesson-page"` |
+| Module detail | `data-ms-code="module-page"` |
+| All courses (public) | `data-ms-code="all-courses-page"` |
+| All courses (member) | `data-ms-code="member-all-courses-page"` |
+| Enrolled courses | `data-ms-code="enrolled-courses-page"` |
+| Saved courses | `data-ms-code="saved-courses-page"` |
+| Nav course dropdown | `data-ms-code="nav-courses"` |
+
+## 2. `data-ms-field` — data bindings
+
+Binds an element's **text content** to a field on a record. The value is
+`record.field`:
+
+```html
+<h1 data-ms-field="course.title">Course title</h1>
+<p  data-ms-field="lesson.description">Lesson description</p>
+```
+
+The placeholder text you type in Webflow is replaced at runtime. If the field
+is empty, most scripts leave the placeholder untouched rather than blank it.
+
+## 3. `ms-code-*` — behaviour config
+
+Configures behaviour, usually on the page wrapper or a link. The most common:
+
+| Attribute | Where | Purpose |
+|---|---|---|
+| `ms-code-table-*` | page wrapper | Override a Memberstack table name (e.g. `ms-code-table-course="courses"`) |
+| `ms-code-detail-page` | a link | Destination path for a generated link (e.g. `/course`) |
+| `ms-code-id-param` | a link | Query param for the record id (default `id`) |
+| `ms-code-slug-param` | page wrapper | Query param for a slug lookup (default `slug`) |
+| `ms-code-per-page` | a list container | Cap how many records render |
+| `ms-code-where` | a list container | Filter expression, e.g. `completed:0` |
+| `ms-code-mode` | a list container | `count` renders a tally instead of a list |
+
+Table names all have sensible defaults, so `ms-code-table-*` is only needed if
+your Memberstack tables are named differently.
+
+## 4. `data-ms-show-if` — state variants
+
+Lets one design contain **every state**. You build each variant once; the
+script shows the matching one and hides the rest.
+
+```html
+<div data-ms-show-if="status" data-ms-show-value="done">…</div>
+<div data-ms-show-if="status" data-ms-show-value="active">…</div>
+<div data-ms-show-if="status" data-ms-show-value="locked">…</div>
+<div data-ms-show-if="status" data-ms-show-value="todo">…</div>
+```
+
+Common variant groups: `status` (lesson rows), `cta` and `enroll` (course
+detail), `complete` and `save-lesson` (lesson detail), `state` (pagination
+cards).
+
+## Templates and clones
+
+A **list** is rendered by cloning a template:
+
+- The list container holds one element marked `*-template`
+  (`course-template`, `lesson-template`, `module-template`, …).
+- The script hides the template, then inserts one clone per record.
+- Each clone is tagged `data-ms-clone="true"` so re-renders can clear old clones.
+
+You only build **one** card or row in Webflow. The script does the rest.
+
+## List state slots
+
+Most list pages accept optional **state slots** — build them once, anywhere
+inside the page wrapper:
+
+| Slot | Shown when |
+|---|---|
+| `data-ms-code="list-loading"` | data is being fetched |
+| `data-ms-code="list-empty"` | the query returned nothing |
+| `data-ms-code="list-error"` | the fetch failed |
+
+All three are optional — the scripts handle their absence safely.
+
+<Callout>
+If a state slot is hidden by a CSS class (rather than an inline style), give it
+`data-ms-display="flex"` (or `block`) so the script can force it visible past
+the class rule.
+</Callout>

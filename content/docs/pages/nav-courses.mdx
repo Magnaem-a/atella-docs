@@ -1,0 +1,44 @@
+---
+title: Nav Course Dropdown
+description: The course list rendered inside the site navigation dropdown.
+---
+
+Source: `scripts/nav-courses.js`. A small script that fills the navigation
+dropdown with course cards. It can run on every page (the nav is global).
+
+## Wrapper
+
+```html
+<div data-ms-code="nav-courses" ms-code-table="courses" ms-code-per-page="4">
+  <a data-ms-code="list-template"
+     ms-code-detail-page="/course"
+     ms-code-id-param="id">
+    …card design…
+  </a>
+</div>
+```
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="nav-courses"` | wrapper | Marks the dropdown (page marker) |
+| `ms-code-table` | wrapper | Table to read (default `courses`) |
+| `ms-code-per-page` | wrapper | Cap the number of cards (optional) |
+| `data-ms-code="list-template"` | inner link | Card design, cloned per course |
+| `ms-code-detail-page` | template | Destination path (default `/course`) |
+| `ms-code-id-param` | template | Id query param (default `id`) |
+
+## Card fields
+
+Inside the template:
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="cover_image"` | Sets `src` on an `<img>` |
+| `data-ms-field="title"` | Course title |
+| `data-ms-field="description"` | Course description |
+| `data-ms-field="category"` | Category |
+| `data-ms-code="lesson-count"` | "10 Lessons" |
+| `data-ms-code="hours-estimate"` | "4 Hours" |
+
+Courses are sorted by `order`. The template's `href` is set automatically from
+`ms-code-detail-page` + the course id.

@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# atella-docs
 
-## Getting Started
+Documentation site for the **Atella member area** — the Webflow + Memberstack
+learning site. Built with [Fumadocs](https://fumadocs.dev) (Next.js).
 
-First, run the development server:
+The docs explain, page by page, how the scripts work and which attributes each
+Webflow page needs. The scripts themselves live in the separate
+[`Magnaem-a/atella`](https://github.com/Magnaem-a/atella) repo.
+
+## Develop
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Where the content lives
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+All documentation is MDX in **`content/docs/`**:
 
-## Learn More
+```
+content/docs/
+  index.mdx            Overview
+  getting-started.mdx  The atella.js bundle, CDN, Webflow setup
+  attributes.mdx       data-ms-code / data-ms-field / ms-code-* conventions
+  data-tables.mdx      Memberstack table schema
+  pages/               One file per page script (dashboard, course-detail, …)
+  meta.json            Sidebar order
+```
 
-To learn more about Next.js, take a look at the following resources:
+To edit the docs you only touch `content/docs/`. `meta.json` files control the
+sidebar order.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Deploy
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Push to GitHub and import the repo in Vercel — Fumadocs is a standard Next.js
+app, so Vercel builds it with no extra configuration.
 
-## Deploy on Vercel
+## Build
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+```

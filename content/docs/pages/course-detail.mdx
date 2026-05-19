@@ -1,0 +1,111 @@
+---
+title: Course Detail
+description: The /course?id=... page — hero, CTA, curriculum, outcomes, instructor, enrolment actions.
+---
+
+Source: `scripts/course-detail.js`. Renders one course from `?id=` (or `?slug=`)
+and wires every course action.
+
+## Page wrapper
+
+```html
+<section
+  data-ms-code="course-page"
+  ms-code-id-param="id"
+  ms-code-slug-param="slug"
+  ms-code-table-course="courses"
+  ms-code-table-module="modules"
+  ms-code-table-lesson="lessons"
+  ms-code-table-instructor="instructors"
+  ms-code-table-outcome="outcomes"
+  ms-code-table-progress="lesson_progress"
+  ms-code-table-enrollment="enrollments"
+  ms-code-table-saved-courses="saved_courses"
+  ms-code-table-saved-lessons="saved_lessons"
+  ms-code-table-activity="activity">
+</section>
+```
+
+The `ms-code-table-*` values are defaults — only include the ones you need to
+override.
+
+## Hero
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="course.title"` | Title |
+| `data-ms-field="course.description"` | Description |
+| `data-ms-field="course.category"` | Category |
+| `data-ms-field="course.lesson_count"` | Lesson count |
+| `data-ms-field="course.hours_estimate"` | Hours estimate |
+| `data-ms-code="modules-count"` | Number of modules |
+| `data-ms-code="updated-at"` | "APR 2026" |
+| `data-ms-code="progress-count"` | Completed lesson count |
+| `data-ms-code="progress-fill"` | Progress-bar fill |
+| `data-ms-code="cover-bg"` / `cover-img` | Cover image |
+
+## CTA + enrolment states
+
+The CTA shows one variant via `data-ms-show-if="cta"`:
+
+| Value | When | Element |
+|---|---|---|
+| `enroll` | not enrolled | `data-ms-code="enroll-btn"` |
+| `reactivate` | paused / dropped | `data-ms-code="reactivate-btn"` |
+| `resume` | enrolled & a lesson opened or completed | `data-ms-code="detail-link"` |
+| `start` | enrolled, nothing touched yet | `data-ms-code="detail-link"` |
+
+<Callout>
+`resume` shows once **any lesson has been opened** — not only after one is
+completed. `resume-order` / `resume-cta-label` fill the "Continue · Lesson 03"
+text.
+</Callout>
+
+Enrolment status variant via `data-ms-show-if="enroll"` with values
+`active · paused · dropped · completed · none`, plus label targets like
+`data-ms-code="enroll-active-label"`.
+
+Other actions: `data-ms-code="watch-first"`, `save-course`, `drop`,
+`hard-unenroll`.
+
+## Curriculum
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="curriculum"` | wrapper | Curriculum section |
+| `data-ms-code="module-template"` | inner | Module block (cloned per module) |
+| `data-ms-code="lesson-template"` | inside module | Lesson row (cloned per lesson) |
+| `data-ms-code="module-link"` | optional | Link to the module page |
+
+Lesson rows carry status variants — `data-ms-show-if="status"` with
+`done · active · locked · todo`. The first unfinished lesson is `active`; later
+unfinished lessons are `locked` (strict drip). If no `locked` variant exists in
+the markup, locked rows fall back to `todo` and stay clickable.
+
+## Outcomes
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="outcomes"` | Section wrapper (hidden if no outcomes) |
+| `data-ms-code="outcome-template"` | Card, cloned per outcome |
+| `data-ms-field="outcome.title"` / `outcome.description` | Card text |
+| `data-ms-code="outcome-label"` | "OUTCOME 01" |
+
+## Instructor
+
+`data-ms-code="instructor"` wrapper, with `data-ms-field="instructor.name |
+instructor.title | instructor.bio | instructor.avatar"`.
+
+## Confirm modals
+
+`drop` and `hard-unenroll` open confirm modals: `data-ms-code="drop-modal"` /
+`reset-modal`, each containing `confirm-yes`, `confirm-cancel`,
+`confirm-backdrop`. With no modal element, the script falls back to a native
+`confirm()`.
+
+<Callout type="warn">
+**Reset** (`hard-unenroll`) deletes the enrolment, all `lesson_progress`, saved
+rows, and activity for the course. If an auxiliary table (e.g. `saved_lessons`)
+is missing, that part is skipped — the core enrolment + progress wipe still
+runs.
+</Callout>

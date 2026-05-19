@@ -1,0 +1,100 @@
+---
+title: Lesson Detail
+description: The /lesson?id=... page — video, breakdown, resources, curriculum, progress tracking.
+---
+
+Source: `scripts/lesson-detail.js`. Renders one lesson from `?id=` (or `?slug=`)
+and tracks progress.
+
+## Page wrapper
+
+```html
+<section
+  data-ms-code="lesson-page"
+  ms-code-id-param="id"
+  ms-code-slug-param="slug"
+  ms-code-table-course="courses"
+  ms-code-table-module="modules"
+  ms-code-table-lesson="lessons"
+  ms-code-table-progress="lesson_progress"
+  ms-code-table-breakdown="lesson_breakdown"
+  ms-code-table-reference="reference"
+  ms-code-table-saved-lessons="saved_lessons">
+</section>
+```
+
+## Progress tracking
+
+<Callout>
+**A `lesson_progress` row is created the moment the lesson page loads** —
+`completed: 0`, `last_watched_at` = now. Marking complete updates that row to
+`completed: 1`. This is what makes the course show as *In progress* and the
+dashboard continue card resolve. Opening a lesson twice never creates a
+duplicate — the script re-checks fresh data before any write.
+</Callout>
+
+## Breadcrumbs
+
+`data-ms-code="crumb-learn | crumb-course | crumb-module | crumb-lesson"`, with
+`ms-code-detail-page` on each link and `data-ms-field="course.title |
+module.title | lesson.title"` for the names.
+
+## Hero + video
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="lesson.title"` | Title |
+| `data-ms-field="lesson.description"` | Description |
+| `data-ms-code="lesson-meta"` | "LESSON 01 OF 05 · 12 MIN" |
+| `data-ms-code="video-player"` | Video — an `iframe`, `video`, or embed `div` |
+| `data-ms-code="module-progress-label"` | "3 / 8 LESSONS" |
+| `data-ms-code="progress-fill"` | Progress-bar fill |
+
+`video-player` accepts a raw YouTube/Vimeo URL on the lesson — the script
+converts it to an embed URL and injects an iframe if needed.
+
+## Completion action
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="mark-complete"` | The mark-complete / mark-incomplete button |
+| `data-ms-show-if="complete"` | Variants `todo` / `done` |
+
+Clicking re-reads fresh progress, then creates or updates the row, and reloads.
+
+## Lesson breakdown
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="lesson-breakdown"` | List wrapper |
+| `data-ms-code="breakdown-template"` | Row, cloned per `lesson_breakdown` record |
+| `data-ms-field="lesson_breakdown.content"` | The bullet text |
+
+## Resources
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="resources"` | List wrapper |
+| `data-ms-code="resource-template"` | Row, cloned per `reference` record |
+| `data-ms-field="reference.title"` | Resource label |
+| `data-ms-field="reference.type"` | `code` / `link` / `download` / `transcript` |
+| `data-ms-code="resources-count"` | "5 ITEMS" |
+
+## Sidebar curriculum
+
+`data-ms-code="curriculum"` wrapper + `data-ms-code="lesson-template"` rows.
+Status variants `data-ms-show-if="status"` with `done · active · locked · todo`
+(strict drip — locked rows are non-clickable).
+
+## Save + pagination
+
+- Save: `data-ms-code="save-lesson"`, variants `data-ms-show-if="save-lesson"`
+  with `saved` / `unsaved`.
+- Prev / next: `data-ms-code="prev-lesson"` / `next-lesson` with
+  `ms-code-detail-page="/lesson"`; optional `prev-label` / `next-label`.
+- `data-ms-code="view-course"` links back to the course.
+
+<Callout type="warn">
+The save-lesson button needs the `saved_lessons` table to exist in Memberstack.
+If it's missing the page still loads fine — the save just won't persist.
+</Callout>

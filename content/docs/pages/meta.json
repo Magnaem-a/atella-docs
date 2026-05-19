@@ -1,0 +1,14 @@
+{
+  "title": "Page Scripts",
+  "pages": [
+    "dashboard",
+    "course-detail",
+    "lesson-detail",
+    "module-detail",
+    "all-courses",
+    "member-all-courses",
+    "enrolled-courses",
+    "saved-courses",
+    "nav-courses"
+  ]
+}

@@ -1,0 +1,115 @@
+---
+title: Dashboard
+description: The member home page — stats, continue card, course grid, and recent activity.
+---
+
+Source: `scripts/dashboard.js`. The dashboard has **four independent sections**.
+Each one finds its own containers and renders only if they are present, so the
+section markup is optional — build the parts you want.
+
+## Tables read
+
+`lesson_progress` (owner-scoped), `lessons`, `modules`, `courses`, `activity`.
+
+All reads go through `window.MSDataCache`, so the four sections share one set of
+cached, deduplicated queries.
+
+## Section 1 — Stats strip
+
+Single-value stat targets, placed anywhere on the page:
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-code="lessons-total"` | Total number of lessons across all courses |
+| `data-ms-code="streak"` | Day streak — consecutive days with lesson activity |
+
+### Count boxes
+
+A count box tallies `lesson_progress` rows matching a filter:
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="list-container"` | wrapper | The count box |
+| `ms-code-mode="count"` | wrapper | Switches it to count mode |
+| `ms-code-table="lesson_progress"` | wrapper | Table to count |
+| `ms-code-where="completed:1"` | wrapper | Filter, `field:value` |
+| `data-ms-code="count-value"` | inner node | Receives the number |
+
+<Callout>
+The **streak** counts any day the member opened *or* completed a lesson — since
+opening a lesson records a `lesson_progress` row. It is an engagement streak,
+not a completion streak.
+</Callout>
+
+## Section 2 — Continue card + narrative
+
+Points the member at the next lesson to resume.
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="narrative"` | text node | "You're N lessons into …" line |
+| `data-ms-code="list-container"` | wrapper | Continue-card container |
+| `ms-code-table="lesson_progress"` | wrapper | Required on the container |
+| `ms-code-where="completed:0"` | wrapper | Required — identifies this container |
+| `data-ms-code="list-template"` | inner | The card design (cloned once) |
+
+Inside the template:
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="lesson.title"` | Lesson title |
+| `data-ms-code="continue-label"` | "COURSE 01 · LESSON 03" |
+| `data-ms-code="module-path"` | "Course title · Module 2: …" |
+| `data-ms-code="continue-time-remaining"` | Time remaining label |
+| `data-ms-code="module-progress-label"` | "3 / 8 LESSONS" |
+| `data-ms-code="module-progress-fill"` | Progress-bar fill (width set) |
+| `data-ms-code="detail-link"` | Resume links — `data-ms-field="lesson.id"` or `course.id` |
+
+The resume lesson is the **first unfinished lesson of the most recently active
+course** (by `last_watched_at` / `completed_at`). If every touched course is
+finished, the card shows its `list-empty` state.
+
+## Section 3 — Course grid
+
+Variant-pattern cards, one per course.
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="list-container"` | wrapper | Grid container |
+| `ms-code-table="courses"` | wrapper | Required |
+| `ms-code-per-page="3"` | wrapper | Optional cap |
+| `data-ms-code="list-template"` | inner | Card design |
+
+Inside the card: `data-ms-field="title|description|category"`,
+`data-ms-code="course-lessons-label"`, `course-progress-fill`,
+`course-progress-percent`, `detail-link`. Status drives variants:
+
+```html
+<div data-ms-show-if="status" data-ms-show-value="not_started">…</div>
+<div data-ms-show-if="status" data-ms-show-value="in_progress">…</div>
+<div data-ms-show-if="status" data-ms-show-value="complete">…</div>
+```
+
+<Callout>
+A course is **`in_progress`** as soon as the member has opened *or* completed
+any lesson in it. **`not_started`** means zero progress rows; **`complete`**
+means every lesson done.
+</Callout>
+
+## Section 4 — Recent activity
+
+| Attribute | On | Purpose |
+|---|---|---|
+| `data-ms-code="list-container"` | wrapper | Feed container |
+| `ms-code-table="activity"` | wrapper | Required |
+| `ms-code-per-page="5"` | wrapper | Optional cap (default 5) |
+| `data-ms-code="list-template"` | inner | Row design |
+
+Inside the row: `data-ms-code="activity-meta"` (synthesised from `type` +
+lesson title if `meta_text` is empty), `data-ms-code="activity-time"` (relative
+time), and `data-ms-show-if="type"` variants for per-type icons.
+
+## List states
+
+Any container accepts `data-ms-code="list-loading | list-empty | list-error"`
+slots — see [Attributes](/docs/attributes).

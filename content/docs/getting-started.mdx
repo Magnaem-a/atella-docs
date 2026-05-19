@@ -1,0 +1,109 @@
+---
+title: Getting Started
+description: How the atella.js bundle is built, hosted on a CDN, and loaded into Webflow.
+---
+
+All page scripts live in one repository and ship as a **single bundled file**,
+`atella.js`, served from a CDN and loaded once across the whole site.
+
+## The repository
+
+The scripts live in the [`Magnaem-a/atella`](https://github.com/Magnaem-a/atella)
+repo:
+
+```
+scripts/        ← source files, one per page (edit these)
+  shared-cache.js     window.MSDataCache — caching, pagination, 429 retry, writes
+  dashboard.js        dashboard sections + shared helpers
+  course-detail.js
+  lesson-detail.js
+  module-detail.js
+  all-courses.js
+  member-all-courses.js
+  enrolled-courses.js
+  saved-courses.js
+  nav-courses.js
+build.js        ← concatenates scripts/ → public/atella.js
+public/
+  atella.js     ← generated bundle (served by the CDN — never edit by hand)
+vercel.json     ← static hosting + cache headers
+```
+
+<Callout type="warn">
+`public/atella.js` is **generated**. Never edit it directly — `build.js`
+overwrites it. Edit the matching file in `scripts/`.
+</Callout>
+
+## How "one file, every page" works
+
+`atella.js` is the concatenation of `shared-cache.js` followed by every page
+script. Each page script is a self-contained IIFE that looks for a **page
+marker** — `[data-ms-code="course-page"]`, `[data-ms-code="lesson-page"]`, and
+so on — and exits immediately if it is not found.
+
+So the whole bundle loads on every page, but only the matching page's code
+actually runs. `shared-cache.js` is first because it defines
+`window.MSDataCache`, which every other script depends on.
+
+## Editing workflow
+
+1. Edit the relevant file in `scripts/`.
+2. Rebuild the bundle:
+   ```bash
+   node build.js
+   ```
+3. Commit and push. The CDN redeploys automatically.
+
+## Hosting (Vercel)
+
+The repo is deployed as a **static project** on Vercel — no framework, no build
+step. `vercel.json` points the output at `public/`, so the bundle is served at:
+
+```
+https://atella-course.vercel.app/atella.js
+```
+
+The response is sent as `application/javascript` with permissive CORS and a
+short cache (`max-age=300`) plus `stale-while-revalidate`.
+
+<Callout>
+If Vercel tries to build the repo as a Next.js app, set **Framework Preset →
+Other** in the project settings, or rely on the `framework: null` line already
+in `vercel.json`.
+</Callout>
+
+## Loading it in Webflow
+
+Add **one** line in Webflow → **Site Settings → Custom Code → Before `</body>`**
+(site-wide, not per page):
+
+```html
+<script defer src="https://atella-course.vercel.app/atella.js"></script>
+```
+
+That is the only script tag the site needs. Remove any old per-page `<script>`
+embeds — the bundle replaces them all; leaving them would run the code twice.
+
+### Cache busting
+
+Browsers cache the file for 5 minutes. To force an update immediately after a
+deploy, bump a version query:
+
+```html
+<script defer src="https://atella-course.vercel.app/atella.js?v=2"></script>
+```
+
+## What runs on every page
+
+`shared-cache.js` exposes `window.MSDataCache`, the data layer every page uses:
+
+- **Pagination** — reads every page of a Memberstack table (100 rows at a time).
+- **Caching** — identical `(table, where)` queries are deduplicated and cached
+  in `sessionStorage` for 30 seconds.
+- **Rate limits** — `429` responses retry up to 4 times with exponential
+  backoff + jitter, honouring `Retry-After`.
+- **Writes** — `runWrites` runs writes with bounded concurrency and the same
+  429 backoff.
+
+See [Attributes](/docs/attributes) for the tagging conventions, and the
+[page scripts](/docs/pages/dashboard) for what each page needs.

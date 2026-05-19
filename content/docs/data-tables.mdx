@@ -1,0 +1,172 @@
+---
+title: Data Tables
+description: The 12 Memberstack data tables that back every page of the member area.
+---
+
+All content and member progress lives in **Memberstack Data Tables**. There are
+12 tables. Set them up in the Memberstack dashboard before seeding data.
+
+<Callout type="warn">
+**Access Rules matter.** Content tables (`courses`, `lessons`, `outcomes`,
+`lesson_breakdown`, `reference`, …) must have **Read = any authenticated
+member**. If Read is left owner-only, a query succeeds but returns **zero
+rows** — the page looks empty with no error. This is the single most common
+"my data isn't showing" cause.
+</Callout>
+
+## Content tables
+
+### `courses`
+| Field | Type | Notes |
+|---|---|---|
+| `title` | TEXT | "Building with Claude & MCP" |
+| `slug` | TEXT | URL identifier |
+| `category` | TEXT | `foundations` · `craft` · `shipping` |
+| `description` | TEXT | Short course description |
+| `lesson_count` | NUMBER | Total lessons |
+| `hours_estimate` | TEXT | Text so you can write "~4 hours" |
+| `cover_image` | TEXT | Image URL |
+| `order` | NUMBER | Display order |
+
+Read: any member · Write: admin only.
+
+### `instructors`
+| Field | Type | Notes |
+|---|---|---|
+| `name` | TEXT | Instructor name |
+| `title` | TEXT | "Founder · Lead Instructor" |
+| `avatar` | URL | Profile image |
+| `courses` | REFERENCE_MANY → courses | Courses they teach |
+| `years_of_experience` | TEXT | Text so you can write "10+" |
+| `bio` | TEXT | Shown on the course detail page |
+
+The link is stored on the **instructor** side. To find a course's instructor,
+query `instructors` where `courses` contains the course id.
+
+### `modules`
+| Field | Type | Notes |
+|---|---|---|
+| `title` | TEXT | "Foundations of the API" |
+| `slug` | TEXT | URL identifier |
+| `course` | REFERENCE → courses | Parent course |
+| `lesson_count` | NUMBER | Lessons in the module |
+| `order` | NUMBER | Order within the course |
+
+### `lessons`
+| Field | Type | Notes |
+|---|---|---|
+| `title` | TEXT | Lesson title |
+| `slug` | TEXT | URL identifier |
+| `module` | REFERENCE → modules | Parent module |
+| `course` | REFERENCE → courses | Denormalized — same course as the module |
+| `duration_minutes` | NUMBER | Length in minutes |
+| `video_url` | TEXT | YouTube/Vimeo URL |
+| `description` | TEXT | One-line description |
+| `order` | NUMBER | Order within the module |
+
+### `outcomes`
+Drives the "What you'll build" cards on the course detail page.
+
+| Field | Type | Notes |
+|---|---|---|
+| `title` | TEXT | Outcome headline |
+| `description` | TEXT | One-line subhead |
+| `course` | REFERENCE → courses | Parent course |
+| `order` | NUMBER | Display order |
+
+### `lesson_breakdown`
+The in-lesson agenda — "what we cover, in order".
+
+| Field | Type | Notes |
+|---|---|---|
+| `content` | TEXT | One bullet / step |
+| `lesson` | REFERENCE → lessons | Parent lesson |
+| `order` | NUMBER | Order within the lesson |
+
+### `reference`
+Resources attached to a lesson.
+
+| Field | Type | Notes |
+|---|---|---|
+| `title` | TEXT | Display label |
+| `url` | TEXT | Where the resource lives |
+| `type` | TEXT | `code` · `link` · `download` · `transcript` |
+| `lesson` | REFERENCE → lessons | Parent lesson |
+| `order` | NUMBER | Order within the lesson |
+
+## Member tables
+
+These are **owner-scoped** — each member reads and writes only their own rows.
+
+### `enrollments`
+Course-level: is this member taking this course?
+
+| Field | Type | Notes |
+|---|---|---|
+| `owner` | MEMBER_REFERENCE | The enrolled member |
+| `course` | REFERENCE → courses | Which course |
+| `enrolled_at` | DATE | When they enrolled |
+| `current_lesson` | REFERENCE_MANY → lessons | Lesson(s) they're on |
+| `status` | TEXT | `active` · `paused` · `dropped` · `completed` |
+
+### `lesson_progress`
+Per-lesson: has this member opened / finished lesson X?
+
+| Field | Type | Notes |
+|---|---|---|
+| `owner` | MEMBER_REFERENCE | The member |
+| `lesson` | REFERENCE → lessons | Which lesson |
+| `course` | REFERENCE → courses | Denormalized for fast course-level queries |
+| `completed` | NUMBER | `0` or `1` (no native boolean) |
+| `completed_at` | DATE | Set when `completed` flips to 1 |
+| `last_watched_at` | DATE | Updated each time the lesson is opened |
+
+<Callout>
+A `lesson_progress` row is created the **first time a member opens a lesson**
+(`completed: 0`), and updated to `completed: 1` when they mark it done. "Opened
+at least one lesson" is what flips a course card from *Not started* to *In
+progress*. See [Lesson Detail](/docs/pages/lesson-detail).
+</Callout>
+
+### `saved_courses` / `saved_lessons`
+| Field | Type | Notes |
+|---|---|---|
+| `owner` | MEMBER_REFERENCE | The member who saved |
+| `course` / `lesson` | REFERENCE | What was saved |
+| `course` (on `saved_lessons`) | REFERENCE → courses | Denormalized |
+| `saved_at` | DATE | When saved |
+
+Use `ms-code-prevent-duplicates="true"` on save forms to avoid double rows.
+
+### `activity`
+Append-only feed for the dashboard "Recent activity" card.
+
+| Field | Type | Notes |
+|---|---|---|
+| `owner` | MEMBER_REFERENCE | The member |
+| `type` | TEXT | `lesson_complete` · `course_complete` · `lesson_saved` · `course_saved` · `streak_milestone` · … |
+| `actor_name` | TEXT | Member name at activity time (denormalized) |
+| `lesson` | REFERENCE → lessons | Optional |
+| `course` | REFERENCE → courses | Optional |
+| `meta_text` | TEXT | Human-readable description |
+| `link_url` | TEXT | Where the row links |
+| `created_at` | DATE | Sort order |
+
+## Provisioning order
+
+REFERENCE fields can only target tables that already exist. Create tables in
+this order:
+
+`courses` → `instructors` → `modules` → `lessons` → `enrollments` →
+`lesson_progress` → `saved_courses` → `saved_lessons` → `outcomes` →
+`lesson_breakdown` → `reference` → `activity`
+
+## Reference-field gotcha
+
+When writing a REFERENCE field via `createDataRecord`, Memberstack accepts the
+id directly; fall back to an object if that errors:
+
+```js
+data: { course: 'rec_abc123' }        // preferred
+data: { course: { id: 'rec_abc123' } } // fallback
+```

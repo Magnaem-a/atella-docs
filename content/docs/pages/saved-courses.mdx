@@ -1,0 +1,62 @@
+---
+title: Saved Courses
+description: The member's saved courses, with filters and an unsave action.
+---
+
+Source: `scripts/saved-courses.js`. Member-scoped — shows only courses the
+member has a `saved_courses` row for. Same UI pattern as
+[Enrolled Courses](/docs/pages/enrolled-courses).
+
+## Page wrapper
+
+```html
+<section
+  data-ms-code="saved-courses-page"
+  ms-code-table-course="courses"
+  ms-code-table-lesson="lessons"
+  ms-code-table-progress="lesson_progress"
+  ms-code-table-saved-courses="saved_courses">
+</section>
+```
+
+## Header stats
+
+`data-ms-code="courses-count"`, `lessons-count`, `hours-count`.
+
+## Filters
+
+`data-ms-code="filter-tabs"` + `filter-tab-template` (with `filter-label` /
+`filter-count`). Tabs: **All**, **In Progress**, **Not Started**, **Completed**.
+
+## Course grid
+
+| Attribute | Purpose |
+|---|---|
+| `data-ms-code="course-grid"` | Grid wrapper |
+| `data-ms-code="course-template"` | Card, cloned |
+| `data-ms-field="course.title"` / `course.description` / `course.category` | Card text |
+| `data-ms-code="course-stats"` | "10 LESSONS · ~4 HOURS" |
+| `data-ms-code="course-progress-fill"` | Progress-bar fill |
+| `data-ms-code="course-cover-bg"` / `course-cover-img` | Cover image |
+| `data-ms-code="detail-link"` | View link (`ms-code-detail-page="/course"`) |
+
+## Status variants
+
+`data-ms-show-if="status"` with `not_started · in_progress · complete`, plus
+optional `data-ms-code="status-label"`.
+
+## Unsave action
+
+A button with `data-ms-action="delete"` inside a card removes that
+`saved_courses` row. The script stamps the row id onto the button
+(`data-ms-record-id`), deletes on click, and reloads.
+
+## List states
+
+Optional `data-ms-code="list-loading | list-empty | list-error"` slots — safe
+to omit.
+
+<Callout>
+Add `?debug` to the page URL to log a load summary (`courses`, `lessons`,
+`saved`, `progress`, `rows`) to the console — handy when the grid looks empty.
+</Callout>

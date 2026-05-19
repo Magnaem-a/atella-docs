@@ -1,0 +1,44 @@
+---
+title: Atella Member Area
+description: Custom scripts that power the Atella learning site on Webflow + Memberstack.
+---
+
+The Atella member area is a **Webflow** site whose dynamic behaviour — course
+lists, lessons, progress tracking, enrolments, saving — is driven by
+**Memberstack Data Tables** and a set of custom scripts.
+
+All of that logic ships as **one JavaScript file, `atella.js`**, hosted on a CDN
+and loaded once site-wide. Each page's code detects which page it is on and runs
+only there.
+
+<Cards>
+  <Card title="Getting Started" href="/docs/getting-started" description="How the bundle is built, hosted, and loaded into Webflow." />
+  <Card title="Attributes" href="/docs/attributes" description="The data-ms-code / data-ms-field / ms-code-* conventions." />
+  <Card title="Data Tables" href="/docs/data-tables" description="The Memberstack schema every page reads from." />
+  <Card title="Page Scripts" href="/docs/pages/dashboard" description="What each page renders and the attributes it needs." />
+</Cards>
+
+## How it fits together
+
+1. **Memberstack Data Tables** hold the content — `courses`, `modules`,
+   `lessons`, `lesson_progress`, `enrollments`, and more.
+2. **Webflow** provides the design. Elements that need data are tagged with
+   `data-ms-*` attributes (no CSS classes are used as script hooks).
+3. **`atella.js`** runs on page load: it reads the tables through a shared
+   cache, finds the tagged elements, and fills them in — lists, progress bars,
+   state variants, links, buttons.
+
+## Mental model
+
+- You **design freely in Webflow**. The scripts never create layout — they only
+  read attributes and write text, links, and visibility.
+- A **template element** marked with a `*-template` attribute is cloned once per
+  record. The original is hidden.
+- **State variants** (`data-ms-show-if`) let one design hold every state —
+  loading, empty, error, done, locked — and the script shows the right one.
+
+## Where to go next
+
+If you are **setting up hosting**, start with [Getting Started](/docs/getting-started).
+If you are **building a page in Webflow**, read [Attributes](/docs/attributes)
+then the [page script](/docs/pages/dashboard) for that page.
