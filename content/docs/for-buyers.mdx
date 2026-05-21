@@ -1,0 +1,128 @@
+---
+title: For Buyers — Setup Guide
+description: Step-by-step setup after purchasing the Atella course template.
+---
+
+This page walks you through everything you do **after purchasing the template**
+to get a running copy on your own Webflow + Memberstack project.
+
+You'll set up four things in this order: **GitHub → Vercel → Memberstack →
+Webflow**. The whole thing takes about 30 minutes.
+
+## What you're getting
+
+- A Webflow template (you clone it from the Webflow Marketplace).
+- This GitHub repo of scripts (`atella`) you'll fork — the one bundled as
+  `atella.js` that powers every dynamic part of the site.
+- This documentation site (`atella-docs`) — optional, for your team's reference.
+
+## Step 1 — Fork the GitHub repo
+
+1. Sign in to [github.com](https://github.com).
+2. Open [`Magnaem-a/atella`](https://github.com/Magnaem-a/atella).
+3. Click **Fork** (top right). Name it whatever you want — `my-atella` works.
+
+That gives you your own copy you can edit and deploy. (You can skip forking
+`atella-docs` unless you also want a custom docs site.)
+
+## Step 2 — Deploy to your own Vercel
+
+1. Sign in to [vercel.com](https://vercel.com) with your GitHub account.
+2. Click **Add New → Project**, pick your forked `atella` repo, click **Deploy**.
+3. Vercel deploys it as static files — **no framework, no build step** needed.
+   The `vercel.json` in the repo tells it to serve `public/atella.js`.
+4. When the deploy finishes, copy the URL — it'll look like
+   `https://your-name.vercel.app`.
+
+Test it works: open `https://your-name.vercel.app/atella.js` in a browser —
+you should see JavaScript text.
+
+<Callout type="warn">
+If Vercel auto-detects "Next.js" and the deploy fails, go to **Settings →
+General → Framework Preset** and change it to **Other**.
+</Callout>
+
+## Step 3 — Provision Memberstack data tables
+
+In your Memberstack dashboard, create **12 tables** with the schema described
+in [Data Tables](/docs/data-tables). Create them in the order listed there —
+some tables reference others, and Memberstack won't let you point a REFERENCE
+field at a table that doesn't exist yet.
+
+For each table, set the **Access Rules** as documented:
+
+- **Content tables** (`courses`, `lessons`, `modules`, `instructors`,
+  `outcomes`, `lesson_breakdown`, `reference`) → **Read = any authenticated
+  member**.
+- **Member tables** (`enrollments`, `lesson_progress`, `saved_courses`,
+  `saved_lessons`, `activity`) → **Read/Write = owner only**.
+
+<Callout type="warn">
+**The most common setup mistake** is leaving Read on a content table as
+owner-only. The query will succeed but return zero rows, and the page will
+look empty with no error. Double-check this for every content table.
+</Callout>
+
+Then seed your own content — courses, modules, lessons, outcomes,
+breakdowns, references — in the Memberstack dashboard.
+
+## Step 4 — Update the script URL in Webflow
+
+1. Open the template in the Webflow Designer.
+2. Go to **Site Settings → Custom Code → Footer Code**.
+3. Find the existing `<script>` line that loads `atella.js` and replace the URL
+   with **your** Vercel URL:
+
+```html
+<script defer src="https://your-name.vercel.app/atella.js"></script>
+```
+
+That's the only place this URL appears. From now on, any change you push to
+your forked GitHub repo will rebuild your Vercel deploy and update every page
+of your Webflow site automatically.
+
+## Step 5 — Publish your Webflow site
+
+Hit **Publish** in Webflow. Test the flow end-to-end:
+
+1. Sign up as a member.
+2. Browse the all-courses page.
+3. Open a course → enrol → open a lesson → mark complete.
+4. Check the dashboard — your continue card should resolve, the course card
+   should say *In Progress*, and the streak should tick.
+
+## Customising the scripts
+
+If you ever need to change a script (e.g. tweak the resume-CTA label, add a
+new section, change a field name), the workflow is:
+
+1. Edit the file in `scripts/` in your forked repo.
+2. Run `node build.js` in the repo root.
+3. Commit and push. Vercel redeploys in about 30 seconds.
+
+`scripts/*.js` are the **source files**. `public/atella.js` is the **generated
+bundle** — never edit it by hand; `build.js` overwrites it on every build.
+
+## Customising Webflow
+
+You can restyle every element freely — the scripts only touch elements by
+**attributes** (`data-ms-code`, `data-ms-field`, `ms-code-*`, `data-ms-show-if`),
+never by CSS classes. Change class names, fonts, colours, spacing as you like
+— as long as the attributes stay, the scripts keep working.
+
+See [Attributes](/docs/attributes) for the full conventions, and the
+[Page Scripts](/docs/pages/dashboard) section for what each page needs.
+
+## Common gotchas
+
+- **Empty pages with no error** → Access Rules on a content table are owner-only
+  (see Step 3).
+- **Dashboard continue card empty** → no `lesson_progress` rows yet. Open any
+  lesson once; the script creates the row automatically.
+- **CTA stuck on "Get started" after completing lessons** → the cached scripts
+  in your browser are stale. Hard-reload, or bump `?v=2` on the script URL.
+- **Vercel build fails as "Next.js"** → see the callout in Step 2.
+
+If something else breaks, open the browser console — every script logs a
+prefix like `[lesson-detail]` or `[course-detail]` and most errors point at
+the exact attribute or table involved.
