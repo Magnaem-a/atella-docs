@@ -103,6 +103,58 @@ new section, change a field name), the workflow is:
 `scripts/*.js` are the **source files**. `public/atella.js` is the **generated
 bundle** — never edit it by hand; `build.js` overwrites it on every build.
 
+## Renaming the template for your project
+
+"Atella" is **pure branding** — it doesn't appear in any of the JavaScript
+that actually runs. So you can rebrand the whole thing for your project with
+a few targeted swaps. None of these affect how the scripts work.
+
+### What you can rename
+
+**Your Vercel URL.** When you create your Vercel project (Step 2), you pick
+the project name. So your CDN URL is whatever you choose — for example
+`https://acme-courses.vercel.app/atella.js`. No "atella" required in the
+domain.
+
+**The bundle filename.** If you want `acme.js` instead of `atella.js`, change
+two things in your fork:
+
+1. In `build.js`, the last line:
+   ```js
+   // before
+   fs.writeFileSync(path.join(publicDir, 'atella.js'), out.join('\n'));
+   // after
+   fs.writeFileSync(path.join(publicDir, 'acme.js'), out.join('\n'));
+   ```
+2. The Webflow `<script>` tag in Site Settings → Custom Code → Footer:
+   ```html
+   <script defer src="https://acme-courses.vercel.app/acme.js"></script>
+   ```
+
+Run `node build.js`, commit, push — done. The new filename ships to Vercel
+and Webflow loads it from there.
+
+**The GitHub repo name.** Cosmetic — your fork can be called whatever you
+like (`acme-scripts`, `my-platform`, …). Doesn't affect functionality.
+
+**The "Atella" word in docs.** A find-and-replace in your fork covers the
+project name in `README.md`, `tables.md`, the `scripts/*.md` notes, and the
+generated bundle header in `build.js`. If you also fork `atella-docs`, do
+the same find-and-replace there.
+
+### What you don't change
+
+The **HTML attribute conventions** are fixed by the script logic and stay
+the same regardless of project name:
+
+- Page markers (`data-ms-code="course-page"`, `data-ms-code="dashboard-page"`, …)
+- Field bindings (`data-ms-field="course.title"`, …)
+- Behaviour config (`ms-code-table-*`, `ms-code-detail-page`, …)
+- Variant groups (`data-ms-show-if="status"`, …)
+
+These come from the [Attributes](/docs/attributes) doc and they're how the
+scripts find your elements. Keep them as-is.
+
 ## Customising Webflow
 
 You can restyle every element freely — the scripts only touch elements by
