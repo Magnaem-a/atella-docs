@@ -80,9 +80,19 @@ Variant-pattern cards, one per course.
 | `ms-code-per-page="3"` | wrapper | Optional cap |
 | `data-ms-code="list-template"` | inner | Card design |
 
-Inside the card: `data-ms-field="title|description|category"`,
-`data-ms-code="course-lessons-label"`, `course-progress-fill`,
-`course-progress-percent`, `detail-link`. Status drives variants:
+Inside the card:
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-field="title"` / `description` / `category` | Course fields |
+| `data-ms-code="course-lessons-label"` | "4 / 10 LESSONS" |
+| `data-ms-code="course-progress-fill"` | Progress-bar fill (width set) |
+| `data-ms-code="course-progress-percent"` / `course-progress-text` | "40%" |
+| `data-ms-code="course-cta-label"` | CTA button label — auto-switches between **"Get started"** (not_started), **"Continue"** (in_progress), and **"Re-watch"** (complete) |
+| `data-ms-code="next-lesson-title"` | Title of the next incomplete lesson — populated only on `in_progress` cards, hidden on `not_started` / `complete` |
+| `data-ms-code="detail-link"` | View link |
+
+Status drives variants:
 
 ```html
 <div data-ms-show-if="status" data-ms-show-value="not_started">…</div>

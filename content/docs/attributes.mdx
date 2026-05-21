@@ -77,9 +77,25 @@ script shows the matching one and hides the rest.
 <div data-ms-show-if="status" data-ms-show-value="todo">…</div>
 ```
 
-Common variant groups: `status` (lesson rows), `cta` and `enroll` (course
-detail), `complete` and `save-lesson` (lesson detail), `state` (pagination
-cards).
+Common variant groups: `status` (lesson rows + course cards), `cta` and
+`enroll` (course detail), `complete`, `save-lesson` and `enrolled` (lesson
+detail), `type` (activity rows), `state` (pagination cards).
+
+### `data-status` on cloned rows
+
+In addition to the `data-ms-show-if` system, lesson rows in the curriculum
+(course detail), module lesson list, and lesson sidebar receive a plain
+`data-status="done|active|locked|todo"` attribute on the row itself. Course
+cards on the dashboard get the same treatment with
+`data-status="not_started|in_progress|complete"`.
+
+That makes it easy to style the **whole row or card** in Webflow with a
+selector like:
+
+```css
+.lesson_item[data-status="active"]   { background: var(--lilac-tint); border-left: 3px solid var(--lilac); }
+.course_card[data-status="complete"] { opacity: 0.85; }
+```
 
 ## Templates and clones
 

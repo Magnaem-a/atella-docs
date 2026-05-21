@@ -78,9 +78,15 @@ Other actions: `data-ms-code="watch-first"`, `save-course`, `drop`,
 | `data-ms-code="module-link"` | optional | Link to the module page |
 
 Lesson rows carry status variants — `data-ms-show-if="status"` with
-`done · active · locked · todo`. The first unfinished lesson is `active`; later
-unfinished lessons are `locked` (strict drip). If no `locked` variant exists in
-the markup, locked rows fall back to `todo` and stay clickable.
+`done · active · locked · todo`. If no `locked` variant exists in the markup,
+locked rows fall back to `todo` and stay clickable.
+
+<Callout>
+**Drip locking is course-wide.** Only one lesson is `active` across the whole
+course at a time — the single first-incomplete lesson in module-then-lesson
+order. Everything after that position is `locked`, even if it lives in a
+later module. So Module 2 Lesson 1 stays locked until Module 1 is finished.
+</Callout>
 
 ## Outcomes
 

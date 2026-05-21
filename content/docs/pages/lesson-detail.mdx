@@ -19,7 +19,8 @@ and tracks progress.
   ms-code-table-progress="lesson_progress"
   ms-code-table-breakdown="lesson_breakdown"
   ms-code-table-reference="reference"
-  ms-code-table-saved-lessons="saved_lessons">
+  ms-code-table-saved-lessons="saved_lessons"
+  ms-code-table-enrollment="enrollments">
 </section>
 ```
 
@@ -59,8 +60,17 @@ converts it to an embed URL and injects an iframe if needed.
 |---|---|
 | `data-ms-code="mark-complete"` | The mark-complete / mark-incomplete button |
 | `data-ms-show-if="complete"` | Variants `todo` / `done` |
+| `data-ms-show-if="enrolled"` | Optional variants `yes` / `no` |
 
 Clicking re-reads fresh progress, then creates or updates the row, and reloads.
+
+<Callout type="warn">
+**Mark-complete is gated on enrolment.** If the member doesn't have an active
+(non-`dropped`) `enrollments` row for the lesson's course, the Mark complete
+button is hidden. Use the optional `data-ms-show-if="enrolled"` variant group
+(`yes` / `no`) to design an "Enrol to track progress" CTA that shows in place
+of the button when the member isn't enrolled.
+</Callout>
 
 ## Lesson breakdown
 
@@ -83,15 +93,31 @@ Clicking re-reads fresh progress, then creates or updates the row, and reloads.
 ## Sidebar curriculum
 
 `data-ms-code="curriculum"` wrapper + `data-ms-code="lesson-template"` rows.
-Status variants `data-ms-show-if="status"` with `done · active · locked · todo`
-(strict drip — locked rows are non-clickable).
+Status variants `data-ms-show-if="status"` with `done · active · locked · todo`.
+
+Each cloned row also receives a `data-status="done|active|locked|todo"`
+attribute on its wrapper, so the **whole row** can be styled in Webflow with
+selectors like `.lesson_item[data-status="active"]`, not only the inner
+status icon.
+
+<Callout>
+**Drip locking is course-wide**, not per-module. A lesson is `active` only if
+it matches the **single** first-incomplete position across the whole course
+(modules sorted by order → lessons by order). Anything after that position is
+`locked`, even if it lives in a later module. So a Module 2 row stays locked
+until Module 1's last lesson is marked complete.
+</Callout>
 
 ## Save + pagination
 
 - Save: `data-ms-code="save-lesson"`, variants `data-ms-show-if="save-lesson"`
   with `saved` / `unsaved`.
 - Prev / next: `data-ms-code="prev-lesson"` / `next-lesson` with
-  `ms-code-detail-page="/lesson"`; optional `prev-label` / `next-label`.
+  `ms-code-detail-page="/lesson"`; optional `prev-label` / `next-label`. The
+  last lesson of a module automatically links forward to the **next module's
+  first lesson** (labelled "Next Module →"), and the first lesson links back
+  to the previous module's last lesson — so members can keep moving without
+  going back to the course page.
 - `data-ms-code="view-course"` links back to the course.
 
 <Callout type="warn">

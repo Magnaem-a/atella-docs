@@ -63,8 +63,16 @@ Two variant groups drive each row:
 <div data-ms-show-if="action" data-ms-show-value="replay|continue|start|locked">…</div>
 ```
 
-Strict drip: the first unfinished lesson is `active`/`continue`; later
-unfinished lessons are `locked` and non-clickable.
+Each cloned row also gets a `data-status="done|active|locked|todo"` attribute
+on its wrapper, so the **whole row** can be styled in Webflow with
+`.lesson_item[data-status="active"]` (etc.) — not only the inner icon.
+
+<Callout>
+**Drip locking is course-wide.** A lesson in this module is `active` only if
+it matches the single first-incomplete position across the whole course
+(modules sorted by order → lessons by order). So when the previous module
+isn't finished, every lesson in this module shows as `locked`.
+</Callout>
 
 ## Module pagination
 
