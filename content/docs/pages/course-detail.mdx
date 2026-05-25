@@ -97,6 +97,23 @@ later module. So Module 2 Lesson 1 stays locked until Module 1 is finished.
 | `data-ms-field="outcome.title"` / `outcome.description` | Card text |
 | `data-ms-code="outcome-label"` | "OUTCOME 01" |
 
+## First-lesson preview
+
+An optional section that previews the course's first lesson. Hidden if the
+wrapper isn't present.
+
+| Attribute | Renders |
+|---|---|
+| `data-ms-code="first-lesson"` | Section wrapper |
+| `data-ms-field="first-lesson.title"` | First lesson title |
+| `data-ms-field="first-lesson.description"` | First lesson description |
+| `data-ms-field="first-lesson.duration_minutes"` | Duration |
+| `data-ms-field="first-lesson.order"` / `first-module.order` | Lesson / module number |
+| `data-ms-code="first-lesson-duration"` | "12 MIN" |
+| `data-ms-code="first-lesson-meta"` | "LESSON 01 · MODULE 01" |
+| `data-ms-code="preview-thumb"` | Gets a YouTube/Vimeo thumbnail derived from the lesson's `video_url` |
+| `data-ms-code="detail-link"` | Link to the first lesson |
+
 ## Instructor
 
 `data-ms-code="instructor"` wrapper, with `data-ms-field="instructor.name |

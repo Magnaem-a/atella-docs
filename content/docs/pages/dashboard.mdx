@@ -14,6 +14,12 @@ section markup is optional — build the parts you want.
 All reads go through `window.MSDataCache`, so the four sections share one set of
 cached, deduplicated queries.
 
+Unlike the other pages, the dashboard has **no required page marker** — each of
+the four sections detects its own containers. If you need to override a table
+name, you can put an optional `[data-ms-code="dashboard-page"]` wrapper around
+the dashboard carrying `ms-code-table-*` attributes; otherwise the defaults
+above are used.
+
 ## Section 1 — Stats strip
 
 Single-value stat targets, placed anywhere on the page:
@@ -85,7 +91,10 @@ Inside the card:
 | Attribute | Renders |
 |---|---|
 | `data-ms-field="title"` / `description` / `category` | Course fields |
-| `data-ms-code="course-lessons-label"` | "4 / 10 LESSONS" |
+| `data-ms-code="course-lessons-label"` | "4 / 10 LESSONS" (combined) |
+| `data-ms-code="course-lessons-count"` | Completed count only ("4") |
+| `data-ms-code="course-lessons-total"` | Total count only ("10") |
+| `data-ms-code="course-hours"` | Hours estimate (e.g. "~4 hours") |
 | `data-ms-code="course-progress-fill"` | Progress-bar fill (width set) |
 | `data-ms-code="course-progress-percent"` / `course-progress-text` | "40%" |
 | `data-ms-code="course-cta-label"` | CTA button label — auto-switches between **"Get started"** (not_started), **"Continue"** (in_progress), and **"Re-watch"** (complete) |
