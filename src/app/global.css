@@ -1,6 +1,17 @@
 @import 'tailwindcss';
-@import 'fumadocs-ui/css/neutral.css';
+@import 'fumadocs-ui/css/ocean.css';
 @import 'fumadocs-ui/css/preset.css';
+
+/* Nudge the accent toward Memberstack's brand blue (clean light theme). */
+:root {
+  --color-fd-primary: #2b59ff;
+  --color-fd-accent: #2b59ff;
+  --color-fd-accent-foreground: #2b59ff;
+}
+.dark {
+  --color-fd-primary: #6f8bff;
+  --color-fd-accent-foreground: #6f8bff;
+}
 
 html {
   scrollbar-gutter: stable;
