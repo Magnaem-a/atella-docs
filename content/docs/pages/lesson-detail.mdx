@@ -95,16 +95,43 @@ of the button when the member isn't enrolled.
 `data-ms-code="curriculum"` wrapper + `data-ms-code="lesson-template"` rows.
 Status variants `data-ms-show-if="status"` with `done · active · locked · todo`.
 
-Each cloned row also receives a `data-status="done|active|locked|todo"`
-attribute on its wrapper, so the **whole row** can be styled by attribute,
-not only the inner status icon. The row whose lesson page is currently open
-additionally gets `data-current="true"` — a **separate** signal from status,
-so the lesson you're viewing can be highlighted even when it's already `done`.
+### Two highlights, in plain English
+
+Any lesson in the sidebar can be two different things — and they're not always
+the same lesson:
+
+1. **The lesson you should do next** (your resume point). Say you've finished
+   lessons 1–3, so lesson 4 is up next.
+2. **The lesson you're looking at right now.** You might click back to lesson 2
+   to re-watch it.
+
+The script tags every row so your design can show both at once:
+
+| Tag the script adds | Means | Goes on |
+|---|---|---|
+| `data-status="active"` | "do this next" (the purple play-icon row) | exactly one row — the resume lesson |
+| `data-status="done\|locked\|todo"` | finished / not unlocked yet / available | every other row |
+| `data-current="true"` | "you're viewing this one right now" | only the row whose page is open |
+
+`data-current` is **separate** from status — so a finished lesson you're
+re-watching still shows its `done` check **and** the "you're here" highlight.
+
+### Styling them (attribute-only, no classes)
+
+You decide what the tags look like with a small style block in Webflow
+(Site Settings → Custom Code → Head):
 
 ```css
-[data-status="active"] { /* the resume lesson — purple play icon row */ }
-[data-current="true"]  { background-color: rgba(26, 29, 46, 0.06); /* the lesson you're viewing */ }
+/* the lesson you're currently viewing → darker background */
+[data-current="true"] { background-color: rgba(26, 29, 46, 0.06); }
+
+/* optional: style the whole "do this next" row too */
+[data-status="active"] { border-left: 3px solid #8b6fb0; }
 ```
+
+In plain words: *"find whatever is tagged as the current lesson and give it a
+darker background."* The script does the "which lesson is which" logic; this
+rule does the look.
 
 There's also an optional `data-ms-show-if="current"` (`yes` / `no`) variant
 group if you'd rather toggle a specific element (e.g. a "● Viewing" badge)
