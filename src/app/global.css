@@ -2,15 +2,14 @@
 @import 'fumadocs-ui/css/ocean.css';
 @import 'fumadocs-ui/css/preset.css';
 
-/* Nudge the accent toward Memberstack's brand blue (clean light theme). */
+/* Nudge the primary toward Memberstack's brand blue (clean light theme).
+   Only override `primary` — leaving `accent`/`accent-foreground` to the
+   preset keeps button/hover text readable. */
 :root {
   --color-fd-primary: #2b59ff;
-  --color-fd-accent: #2b59ff;
-  --color-fd-accent-foreground: #2b59ff;
 }
 .dark {
   --color-fd-primary: #6f8bff;
-  --color-fd-accent-foreground: #6f8bff;
 }
 
 html {
