@@ -89,13 +89,31 @@ In addition to the `data-ms-show-if` system, lesson rows in the curriculum
 cards on the dashboard get the same treatment with
 `data-status="not_started|in_progress|complete"`.
 
-That makes it easy to style the **whole row or card** in Webflow with a
-selector like:
+That makes it easy to style the **whole row or card** in Webflow with
+**attribute-only** selectors (no classes):
 
 ```css
-.lesson_item[data-status="active"]   { background: var(--lilac-tint); border-left: 3px solid var(--lilac); }
-.course_card[data-status="complete"] { opacity: 0.85; }
+[data-status="active"]   { background: var(--lilac-tint); border-left: 3px solid var(--lilac); }
+[data-status="complete"] { opacity: 0.85; }
 ```
+
+The status values don't collide — lesson rows use `done|active|locked|todo`
+and course cards use `not_started|in_progress|complete` — so a bare
+`[data-status="…"]` selector targets exactly what you mean.
+
+### `data-current` on the viewed lesson (lesson page only)
+
+On the lesson-detail sidebar, the single row whose lesson page is currently
+open also gets `data-current="true"`. This is **separate from status** — so a
+completed lesson you're revisiting still shows its `done` check *and* a
+"you're here" highlight. Style it attribute-only:
+
+```css
+[data-current="true"] { background-color: rgba(26, 29, 46, 0.06); }
+```
+
+The purple "resume" icon stays on the `active` (course first-incomplete)
+lesson; `data-current` just marks where you are right now.
 
 ## Templates and clones
 

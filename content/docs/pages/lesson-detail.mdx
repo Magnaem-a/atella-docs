@@ -96,9 +96,19 @@ of the button when the member isn't enrolled.
 Status variants `data-ms-show-if="status"` with `done · active · locked · todo`.
 
 Each cloned row also receives a `data-status="done|active|locked|todo"`
-attribute on its wrapper, so the **whole row** can be styled in Webflow with
-selectors like `.lesson_item[data-status="active"]`, not only the inner
-status icon.
+attribute on its wrapper, so the **whole row** can be styled by attribute,
+not only the inner status icon. The row whose lesson page is currently open
+additionally gets `data-current="true"` — a **separate** signal from status,
+so the lesson you're viewing can be highlighted even when it's already `done`.
+
+```css
+[data-status="active"] { /* the resume lesson — purple play icon row */ }
+[data-current="true"]  { background-color: rgba(26, 29, 46, 0.06); /* the lesson you're viewing */ }
+```
+
+There's also an optional `data-ms-show-if="current"` (`yes` / `no`) variant
+group if you'd rather toggle a specific element (e.g. a "● Viewing" badge)
+than style the whole row.
 
 <Callout>
 **Drip locking is course-wide**, not per-module. A lesson is `active` only if
